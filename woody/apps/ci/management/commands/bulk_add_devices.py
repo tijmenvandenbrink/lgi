@@ -1,6 +1,5 @@
 import os
 import csv
-import pdb
 from datetime import datetime
 from optparse import make_option
 
@@ -30,20 +29,27 @@ class Command(BaseCommand):
 					'processor', 'os_version', 'mgmt_ip_address', 'hw_model', 'os_family', 
 					'last_update_by_snmp', 'hostname']
 
+		if not args[0]:
+			self.stdout.write('Please specify the realm this import belongs to')
+			sys.exit()
+
 		realm = args[0]
 
-		if os.path.exists(options['importfile']):
-			csvfile = csv.DictReader(open(options['importfile'], 'rb'), fieldnames=csvheader, delimiter=',')
-			for dev in csvfile:
-				unique_id = '%s-%s' % (realm, dev['device_id'])
-				# These values can be empty string so we need to convert that to a normal datetime or None if empty
-				dev['last_update_by_snmp'] = normalized_datetimefield(dev['last_update_by_snmp'])
-				dev['last_update_by_cli'] = normalized_datetimefield(dev['last_update_by_cli'])
-				
-				try:
-					Device.objects.filter(pk=unique_id).update(last_seen=timezone.now(), **dev)
-					self.stdout.write('Device already exists. Updating device "%s"\n' % dev['device_id'])
-				except Device.DoesNotExist:
-					d = Device(realm=realm, first_seen=timezone.now(), last_seen=timezone.now(), pk=unique_id, **dev)
-					d.save()
-					self.stdout.write('Successfully added device "%s"\n' % dev['device_id'])
+		if not os.path.exists(options['importfile']):
+			self.stdout.write('File does not exist. Please specify an existing csv file')
+			sys.exit()
+
+		csvfile = csv.DictReader(open(options['importfile'], 'rb'), fieldnames=csvheader, delimiter=',')
+		for dev in csvfile:
+			unique_id = '%s-%s' % (realm, dev['device_id'])
+			# These values can be empty string so we need to convert that to a normal datetime or None if empty
+			dev['last_update_by_snmp'] = normalized_datetimefield(dev['last_update_by_snmp'])
+			dev['last_update_by_cli'] = normalized_datetimefield(dev['last_update_by_cli'])
+			
+			try:
+				Device.objects.filter(pk=unique_id).update(last_seen=timezone.now(), **dev)
+				self.stdout.write('Device already exists. Updating device "%s"\n' % dev['device_id'])
+			except Device.DoesNotExist:
+				d = Device(realm=realm, first_seen=timezone.now(), last_seen=timezone.now(), pk=unique_id, **dev)
+				d.save()
+				self.stdout.write('Successfully added device "%s"\n' % dev['device_id'])
