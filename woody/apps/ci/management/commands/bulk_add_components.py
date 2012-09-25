@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.core.management.base import BaseCommand, CommandError
 from apps.ci.models import CiCommonInfo, Device, Component
 
-from utils import normalized_datetimefield, normalized_postiveintegerfield
+from utils import normalize_datetimefield, normalize_postiveintegerfield
 
 class Command(BaseCommand):
 	option_list = BaseCommand.option_list + (
@@ -46,7 +46,7 @@ class Command(BaseCommand):
 				del component[k]
 
 			for i in ['connected_ports', 'shutdown_ports', 'n_of_ports', 'reserved_ports']:
-				component[i] = normalized_postiveintegerfield(component[i])
+				component[i] = normalize_postiveintegerfield(component[i])
 
 			try:
 				Component.objects.filter(serial=component['serial'], component_id=component['component_id']).update(last_seen=timezone.now(), **component)

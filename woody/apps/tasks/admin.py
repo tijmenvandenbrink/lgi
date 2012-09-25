@@ -16,9 +16,9 @@ class ProfileAdmin(admin.ModelAdmin):
 	inlines = [TaskInline]
 
 class TaskAdmin(admin.ModelAdmin):
-	list_display = ('profile', 'uuid', 'status', 'start', 'end')
-	list_filter = ('profile', 'uuid', 'status', 'start', 'end')
-	search_fields = ['profile', 'uuid', 'status']
+	list_display = ('uuid', 'status', 'start', 'end')
+	list_filter = ('uuid', 'status', 'start', 'end')
+	search_fields = ['uuid', 'status']
 	inlines = [MetricInline]
 
 class MetricAdmin(admin.ModelAdmin):

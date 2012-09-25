@@ -10,7 +10,7 @@ class Profile(models.Model):
 	active = models.BooleanField()
 
 	def __unicode__(self):
-		return u"%s %s" % (self.realm, self.name)
+		return u"%s-%s" % (self.realm, self.name)
 
 class Task(models.Model):
 	''' Task model for keeping track of tasks '''
