@@ -17,7 +17,7 @@ class Task(models.Model):
 	STATUSCHOICES = (('Success', 'Success'), ('Failed', 'Failed'))
 
 	profile = models.ForeignKey(Profile)
-	uuid = models.CharField(max_length=255, primary_key=True)
+	uuid = models.CharField(max_length=255)
 	status = models.CharField(max_length=255, choices=STATUSCHOICES)
 	polling_server = models.CharField(max_length=255)
 	start = models.DateTimeField()
