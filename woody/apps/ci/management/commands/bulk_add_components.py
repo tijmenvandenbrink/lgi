@@ -57,6 +57,4 @@ class Command(BaseCommand):
 					c = d.component_set.create(first_seen=timezone.now(), last_seen=timezone.now(), **component)
 					self.stdout.write('Successfully added component "%s" with serial %s\n' % (component['name'], component['serial']))
 				except:
-					self.stdout.write('Failed to add component "%s" with serial %s\n' % (component['name'], component['serial']))
-
-					
+					self.stdout.write('Failed to add component "%s" with serial %s\n' % (component['name'], component['serial']))	

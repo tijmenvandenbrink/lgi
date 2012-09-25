@@ -19,6 +19,7 @@ class Task(models.Model):
 	profile = models.ForeignKey(Profile)
 	uuid = models.CharField(max_length=255, primary_key=True)
 	status = models.CharField(max_length=255, choices=STATUSCHOICES)
+	polling_server = models.CharField(max_length=255)
 	start = models.DateTimeField()
 	end = models.DateTimeField()
 
