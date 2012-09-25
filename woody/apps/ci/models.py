@@ -5,7 +5,8 @@ from django.db import models
 class CiCommonInfo(models.Model):
 	realm = models.CharField(max_length=255, help_text="Please specify the realm this device belongs to")
 	vendor = models.CharField(max_length=255, blank=True)
-	timestamp = models.DateTimeField()
+	first_seen = models.DateTimeField()
+	last_seen = models.DateTimeField()
 	active = models.BooleanField()
 
 	class Meta:
@@ -24,8 +25,8 @@ class Device(CiCommonInfo):
 
 	source = models.CharField(max_length=255, blank=True)
 
-	last_update_by_cli = models.DateTimeField(blank=True)
-	last_update_by_snmp = models.DateTimeField(blank=True)
+	last_update_by_cli = models.DateTimeField(null=True, blank=True)
+	last_update_by_snmp = models.DateTimeField(null=True, blank=True)
 	
 	chassis_type = models.CharField(max_length=255, blank=True)
 	hardware_version = models.CharField(max_length=255, blank=True)

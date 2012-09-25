@@ -2,12 +2,13 @@ import os
 import csv
 import pdb
 from datetime import datetime
-
 from optparse import make_option
 
 from django.utils import timezone
 from django.core.management.base import BaseCommand, CommandError
 from apps.ci.models import CiCommonInfo, Device
+
+from utils import normalized_datetimefield
 
 class Command(BaseCommand):
 	option_list = BaseCommand.option_list + (
@@ -18,7 +19,7 @@ class Command(BaseCommand):
 				help='Bulk import devices from .csv file'),
 				)
 	args = '''<realm>'''
-	help = 'Bulk adds devices from a file'
+	help = 'Bulk adds devices from a csv file'
 
 	def handle(self, *args, **options):
 		csvheader = ['device_id', 'vendor', 'ip_address', 'source', 'sysname', 
@@ -35,17 +36,14 @@ class Command(BaseCommand):
 			csvfile = csv.DictReader(open(options['importfile'], 'rb'), fieldnames=csvheader, delimiter=',')
 			for dev in csvfile:
 				unique_id = '%s-%s' % (realm, dev['device_id'])
+				# These values can be empty string so we need to convert that to a normal datetime or None if empty
+				dev['last_update_by_snmp'] = normalized_datetimefield(dev['last_update_by_snmp'])
+				dev['last_update_by_cli'] = normalized_datetimefield(dev['last_update_by_cli'])
+				
 				try:
-					d = Device.objects.get(pk=unique_id)
-					self.stdout.write('Device already exists "%s"\n' % dev['device_id'])
+					Device.objects.filter(pk=unique_id).update(last_seen=timezone.now(), **dev)
+					self.stdout.write('Device already exists. Updating device "%s"\n' % dev['device_id'])
 				except Device.DoesNotExist:
-					try:
-						dev['last_update_by_snmp'] = datetime.strptime(dev['last_update_by_snmp'], '%m/%d/%y %H:%M:%S')
-						dev['last_update_by_cli'] = datetime.strptime(dev['last_update_by_cli'], '%m/%d/%y %H:%M:%S')
-					except:
-						dev['last_update_by_cli'] = datetime.now()
-						dev['last_update_by_snmp'] = datetime.now()
-
-					d = Device(realm=realm, timestamp=timezone.now(), pk=unique_id, **dev)
+					d = Device(realm=realm, first_seen=timezone.now(), last_seen=timezone.now(), pk=unique_id, **dev)
 					d.save()
 					self.stdout.write('Successfully added device "%s"\n' % dev['device_id'])
