@@ -30,3 +30,6 @@ class Metric(models.Model):
 	task = models.ForeignKey(Task)
 	metric = models.CharField(max_length=255, primary_key=True)
 	value = models.IntegerField()
+
+	def __unicode__(self):
+		return self.metric
