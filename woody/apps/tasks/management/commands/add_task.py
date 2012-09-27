@@ -17,10 +17,10 @@ class Command(BaseCommand):
 	'''
 
 	def handle(self, *args, **options):
-		profile_unique_id = '%s-%s' % (args[0], args[1])
+		profile_unique_id = '%s-%s' % (args[1].lower(), args[0].lower())
 		try:
 			p = Profile.objects.get(unique_id=profile_unique_id)
-			self.stdout.write('Profile exists "%s"' % (p))
+			self.stdout.write('Profile already exists "%s"\n' % (p))
 		except Profile.DoesNotExist:
 			p = Profile(unique_id=profile_unique_id, name=args[0], realm=args[1], 
 				first_seen=timezone.now(), last_seen=timezone.now(), active=True)
@@ -30,8 +30,7 @@ class Command(BaseCommand):
 		fi = p.task_set.filter(uuid=args[2])
 		if len(fi) == 0:
 			try:
-				t = p.task_set.create(uuid=args[2], status=args[3], polling_server=args[4], 
-					start=normalize_datetimefield(args[5]), end=normalize_datetimefield(args[6]))
+				t = p.task_set.create(uuid=args[2], status=args[3], polling_server=args[4], start=normalize_datetimefield(args[5]), end=normalize_datetimefield(args[6]))
 				self.stdout.write('Successfully added task "%s" to profile %s\n' % (t.uuid, p))
 			except:
 				pdb.set_trace()

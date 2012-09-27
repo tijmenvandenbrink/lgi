@@ -23,6 +23,9 @@ class Task(models.Model):
 	start = models.DateTimeField()
 	end = models.DateTimeField()
 
+	def duration(self):
+		return self.end - self.start
+
 	def __unicode__(self):
 		return self.uuid
 

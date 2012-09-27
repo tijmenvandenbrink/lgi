@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Liberty Global - Asset and Configuration Management - Profile detail{% endblock %}
+
+{% block sidebar %}
+<ul class="nav nav-list">
+  <li class="nav-header">Wandl</li>
+  <li class="active"><a href="#">Dashboard</a></li>
+  <li class="nav-header">Profiles</li>
+  {% if profiles_list %}
+    <ul>
+    {% for profile in profiles_list %}
+      <li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.unique_id }}</a></li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>No profiles are available.</p>
+  {% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<div class="row-fluid">
+  <ul class="breadcrumb">
+  <li><a href="/profiles/">Home</a> <span class="divider">/</span></li>
+  <li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.realm }}</a> <span class="divider">/</span></li>
+  <li class="active">{{ task.uuid }}</li>
+  </ul>
+<div class="page-header">
+  <h1>{{ profile.realm }} | {{ profile.name }} | {{ task.uuid }}</h1>
+</div><!--/page-header-->
+<div class="span5">
+  <div class="row-fluid">
+    <div class="well">
+    <h2>Summary</h2>
+    <dl class="dl-horizontal">
+    <dt>UUID</dt>
+    <dd>{{ task.uuid }}</dd>
+    <dt>Profile</dt>
+    <dd>{{ task.profile }}</dd>
+    <dt>Country</dt>
+    <dd>EU</dd>
+    <dt>Polling Server</dt>
+    <dd>{{ task.polling_server }}</dd>
+    <dt>Last Run</dt>
+    <dd>{{ task.start }}</dd>
+    <dt>Status</dt>
+    {% if task.status == 'Success' %}
+      <dd><span class="label label-success">{{ task.status }}</span></dd>
+    {% elif task.status == 'Failed' %}
+      <dd><span class="label label-important">{{ task.status }}</span></dd>
+    {% else %}
+      <dd><span class="label label-warning">{{ task.status }}</span></dd>
+    {% endif %}
+    <dt>Duration</dt>
+    <dd>{{ task.end }}</dd>
+    </dl>
+    <table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+    <th>Range</th>
+    <th>Number of devices</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>212.2.3.1/24</td>
+    <td>197</td>
+    </tr>
+    <tr>
+    <td>2.1.1.1/24</td>
+    <td>17</td>
+    </tr>
+    </table>
+    </div>
+  </div><!--/row-->
+</div><!--/span-->
+<div class="span5">
+  <div class="row-fluid">
+    <div class="well">
+    <h2>Statistics</h2>
+    <table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+    <th>Metric</th>
+    <th>#</th>
+    <th>Standard Deviation</th>
+    <th>Mean</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Total Collect</td>
+    <td><span class="badge badge-success">2408</span></td>
+    <td>0.05</td>
+    <td>2408</td>
+    </tr>
+    <tr>
+    <td>ICMP Fail</td>
+    <td><span class="badge badge-important">80</span></td>
+    <td>0.12</td>
+    <td>25</td>
+    </tr>
+    <tr>
+    <td>SNMP Fail</td>
+    <td><span class="badge badge-warning">6</span></td>
+    <td>5.12</td>
+    <td>4</td>
+    </tr>
+    </tbody>
+    </table>
+    </div><!--/well-->
+  </div><!--/row-->
+</div><!--/span-->
+</div><!--/row-->
+</div><!--/span10-->
+{% endblock %}

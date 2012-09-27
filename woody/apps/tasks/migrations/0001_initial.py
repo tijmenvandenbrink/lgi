@@ -21,9 +21,11 @@ class Migration(SchemaMigration):
 
         # Adding model 'Task'
         db.create_table('tasks_task', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('profile', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tasks.Profile'])),
-            ('uuid', self.gf('django.db.models.fields.CharField')(max_length=255, primary_key=True)),
+            ('uuid', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('status', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('polling_server', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('start', self.gf('django.db.models.fields.DateTimeField')()),
             ('end', self.gf('django.db.models.fields.DateTimeField')()),
         ))
@@ -68,10 +70,12 @@ class Migration(SchemaMigration):
         'tasks.task': {
             'Meta': {'object_name': 'Task'},
             'end': ('django.db.models.fields.DateTimeField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'polling_server': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'profile': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['tasks.Profile']"}),
             'start': ('django.db.models.fields.DateTimeField', [], {}),
             'status': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'max_length': '255', 'primary_key': 'True'})
+            'uuid': ('django.db.models.fields.CharField', [], {'max_length': '255'})
         }
     }
 
