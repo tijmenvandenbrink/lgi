@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.core.management.base import BaseCommand, CommandError
 from apps.ci.models import CiCommonInfo, Device
 
-from utils import normalized_datetimefield
+from utils import normalize_datetimefield
 
 class Command(BaseCommand):
 	option_list = BaseCommand.option_list + (
@@ -43,8 +43,8 @@ class Command(BaseCommand):
 		for dev in csvfile:
 			unique_id = '%s-%s' % (realm, dev['device_id'])
 			# These values can be empty string so we need to convert that to a normal datetime or None if empty
-			dev['last_update_by_snmp'] = normalized_datetimefield(dev['last_update_by_snmp'])
-			dev['last_update_by_cli'] = normalized_datetimefield(dev['last_update_by_cli'])
+			dev['last_update_by_snmp'] = normalize_datetimefield(dev['last_update_by_snmp'])
+			dev['last_update_by_cli'] = normalize_datetimefield(dev['last_update_by_cli'])
 			
 			try:
 				Device.objects.filter(pk=unique_id).update(last_seen=timezone.now(), **dev)

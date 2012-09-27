@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytz
 
-def normalized_datetimefield(s):
+def normalize_datetimefield(s):
 	if s == '':
 		return None
 	else:
@@ -11,7 +11,7 @@ def normalized_datetimefield(s):
 		except:
 			return None
 
-def normalized_postiveintegerfield(i):
+def normalize_postiveintegerfield(i):
 	if i == '':
 		return 0
 	else:

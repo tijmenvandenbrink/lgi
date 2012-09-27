@@ -10,18 +10,21 @@ class Profile(models.Model):
 	active = models.BooleanField()
 
 	def __unicode__(self):
-		return u"%s %s" % (self.realm, self.name)
+		return u"%s-%s" % (self.realm, self.name)
 
 class Task(models.Model):
 	''' Task model for keeping track of tasks '''
 	STATUSCHOICES = (('Success', 'Success'), ('Failed', 'Failed'))
 
 	profile = models.ForeignKey(Profile)
-	uuid = models.CharField(max_length=255, primary_key=True)
+	uuid = models.CharField(max_length=255)
 	status = models.CharField(max_length=255, choices=STATUSCHOICES)
 	polling_server = models.CharField(max_length=255)
 	start = models.DateTimeField()
 	end = models.DateTimeField()
+
+	def duration(self):
+		return u"%s" % (self.end - self.start)
 
 	def __unicode__(self):
 		return self.uuid
