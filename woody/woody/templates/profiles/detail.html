@@ -39,7 +39,7 @@
         <dt>Country</dt>
         <dd>EU</dd>
         <dt>Last Run</dt>
-        <dd>{{ profile.start }}</dd>
+        <dd>{{ task_list|first }}</dd>
         <dt>Status</dt>
         <dd><span class="label label-success">{{ profile.status }}</span></dd>
         <dt>Schedule</dt>
@@ -130,7 +130,7 @@
 							<td>{{ task.polling_server }}</td>
 							<td>{{ task.start }}</td>
 							<td>{{ task.end }}</td>
-							<td>{{ task.end }}</td>
+							<td>{{ task.duration }}</td>
 							{% if task.status == 'Success' %}
 								<td><span class="label label-success">{{ task.status }}</span></td>
 							{% elif task.status == 'Failed' %}
