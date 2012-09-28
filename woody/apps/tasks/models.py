@@ -29,6 +29,11 @@ class Task(models.Model):
 	def __unicode__(self):
 		return self.uuid
 
+	class Meta:
+		ordering = ['-uuid']
+		get_latest_by = 'start'
+
+
 class Metric(models.Model):
 	''' Analytics model for keeping task metrics '''
 	task = models.ForeignKey(Task)

@@ -13,7 +13,7 @@ from utils import normalize_datetimefield
 class Command(BaseCommand):
 	args = '''<profile name> <realm> <uuid> <status> <polling_server> <start> <end>'''
 	help = '''Add task in the form:\n
-			profilenamex domainx 12394394 Success pollingserverx "mm/dd/yy HH:MM:SS" "mm/dd/yy HH:MM:SS" 
+			profilenamex domainx 12394394 Success pollingserverx "yyyy/mm/dd HH:MM:SS" "yyyy/mm/dd HH:MM:SS" 
 	'''
 
 	def handle(self, *args, **options):

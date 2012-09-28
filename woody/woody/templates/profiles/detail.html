@@ -43,9 +43,15 @@
         <dt>Country</dt>
         <dd>EU</dd>
         <dt>Last Run</dt>
-        <dd>{{ task_list|first }}</dd>
-        <dt>Status</dt>
-        <dd><span class="label label-success">{{ profile.status }}</span></dd>
+        {% with task=profile.task_set.latest %}
+        <dd>{{ task.start }}</dd>
+        <dt>Last Status</dt>
+        {% if task.status == 'Success' %}
+          <dd><span class="label label-success">{{ task.status }}</span></dd>
+        {% else %}
+          <dd><span class="label label-important">{{ task.status }}</span></dd>
+        {% endif %}
+        {% endwith %}
         <dt>Schedule</dt>
         <dd>Daily</dd>
         <dt>Duration</dt>
@@ -115,7 +121,7 @@
 			<thead>
 			<tr>
 			<th>Profile</th>
-			<th>Task UUID</th>
+			<th>UUID</th>
 			<th>Polling server</th>
 			<th>Start</th>
 			<th>Finished</th>

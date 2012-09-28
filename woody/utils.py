@@ -6,7 +6,7 @@ def normalize_datetimefield(s):
 		return None
 	else:
 		try:
-			d = datetime.strptime(s, '%m/%d/%y %H:%M:%S')
+			d = datetime.strptime(s, '%Y/%m/%d %H:%M:%S')
 			return d.replace(tzinfo=pytz.UTC)
 		except:
 			return None
