@@ -5,6 +5,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^profiles/', include('apps.tasks.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+	url(r'^profiles/', include('apps.tasks.urls')),
+	url(r'^admin/', include(admin.site.urls)),
 )
