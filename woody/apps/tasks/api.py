@@ -21,7 +21,13 @@ class ProfileResource(ModelResource):
 		resource_name = 'profile'
 		authentication = BasicAuthentication()
 		authorization = DjangoAuthorization()
-
+		filtering = {
+            'unique_id': ALL,
+            'name': ALL,
+            'realm': ALL,
+            'firstseen': ALL,
+            'lastseen': ALL,
+            'active': ALL }
 
 class TaskResource(ModelResource):
 	profile = fields.ForeignKey(ProfileResource, 'profile')
@@ -33,6 +39,8 @@ class TaskResource(ModelResource):
 		authorization = DjangoAuthorization()
 		filtering = {
             'profile': ALL_WITH_RELATIONS,
-            'uuid': ['exact', 'lt', 'lte', 'gte', 'gt'],
-            'polling_server': ['exact'],
+            'uuid': ALL,
+            'polling_server': ALL,
+            'start': ALL,
+            'end': ALL
         }
