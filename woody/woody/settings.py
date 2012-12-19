@@ -116,6 +116,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'south',
     'tastypie',
+    'chartit',
     'apps.ci',
     'apps.tasks',
 )

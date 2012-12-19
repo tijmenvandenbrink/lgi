@@ -10,7 +10,7 @@
 	{% if profiles_list %}
 	    <ul>
 	    	{% for profile in profiles_list %}
-			<li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.unique_id }}</a></li>
+			<li><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/">{{ profile.unique_id }}</a></li>
 	 	{% endfor %}
 		</ul>
 	{% else %}
@@ -37,6 +37,11 @@
       <th>Last run</th>
       <th>Duration</th>
       <th>Runs</th>
+      <th>Collected</th>
+      <th>Accessed</th>
+      <th>ICMP Fail</th>
+      <th>SNMP Fail</th>
+      <th>CLI Fail</th>
       <th>Status</th>
     </tr>
   </thead>
@@ -45,16 +50,44 @@
   {% with task=profile.task_set.latest count=profile.task_set.count %}
     <tr>
       <td>{{ profile.realm }}</td>
-      <td><a href="/profiles/{{ profile.unique_id }}/">{{ profile.name }}</a></td>
-      <td>{{ task.start }}</td>
+      <td><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/">{{ profile.name }}</a></td>
+      <td>{{ task.start|date:"m/d/Y H:i:s" }}</td>
       <td>{{ task.duration }}</td>
       <td>{{ count }}</td>
+      {% with metric_list=task.metric_set.all %}
+        {% load tasks_extra %}
+        {% if metric_list|get_metric:"Total Collected" == "" %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ metric_list|get_metric:"Total Collected"|default:"0" }}</span></td>
+        {% endif %}
+        {% if metric_list|get_metric:"Accessed" == "" %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ metric_list|get_metric:"Accessed"|default:"0" }}</span></td>
+        {% endif %}
+        {% if metric_list|get_metric:"ICMP Fail" == "" %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ metric_list|get_metric:"ICMP Fail"|default:"0" }}</span></td>
+        {% endif %}
+        {% if metric_list|get_metric:"SNMP Fail" == "" %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ metric_list|get_metric:"SNMP Fail"|default:"0" }}</span></td>
+        {% endif %}
+        {% if metric_list|get_metric:"Failed logins" == "" %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ metric_list|get_metric:"Failed logins"|default:"0" }}</span></td>
+        {% endif %}
       {% if task.status == 'Success' %}
       	<td><span class="label label-success">{{ task.status }}</span></td>
       {% else %}
       	<td><span class="label label-important">{{ task.status }}</span></td>
       {% endif %}
     </tr>
+    {% endwith %}
   {% endwith %}
 {% endfor %}
   </tbody>

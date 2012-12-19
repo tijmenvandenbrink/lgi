@@ -5,7 +5,7 @@ from tastypie.authentication import BasicAuthentication
 from tastypie.authorization import DjangoAuthorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
-from apps.tasks.models import Task, Profile
+from apps.tasks.models import Task, Profile, Metric
 
 class UserResource(ModelResource):
 	class Meta:
@@ -38,9 +38,23 @@ class TaskResource(ModelResource):
 		authentication = BasicAuthentication()
 		authorization = DjangoAuthorization()
 		filtering = {
-            'profile': ALL_WITH_RELATIONS,
+            'profile': ALL,
             'uuid': ALL,
             'polling_server': ALL,
             'start': ALL,
             'end': ALL
+        }
+
+class MetricResource(ModelResource):
+	task = fields.ForeignKey(TaskResource, 'task')
+
+	class Meta:
+		queryset = Metric.objects.all()
+		resource_name = 'metric'
+		authentication = BasicAuthentication()
+		authorization = DjangoAuthorization()
+		filtering = {
+            'task': ALL,
+            'metric': ALL,
+            'value': ALL
         }
