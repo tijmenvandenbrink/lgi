@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+import datetime
 
 class Profile(models.Model):
 	''' A profile is a blueprint of a task '''
@@ -25,6 +27,9 @@ class Task(models.Model):
 
 	def duration(self):
 		return u"%s" % (self.end - self.start)
+
+        def is_today(self):
+                return self.start >= timezone.now() - datetime.timedelta(days=1)
 
 	def __unicode__(self):
 		return self.uuid

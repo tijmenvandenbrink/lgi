@@ -51,15 +51,19 @@
     <tr>
       <td>{{ profile.realm }}</td>
       <td><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/">{{ profile.name }}</a></td>
-      <td>{{ task.start|date:"m/d/Y H:i:s" }}</td>
+      {% load tasks_extra %}
+      {% if task.is_today %}
+        <td><span class="label label-success">{{ task.start|date:"m/d/Y H:i:s" }}</span></td>
+      {% else %}
+        <td><span class="label">{{ task.start|date:"m/d/Y H:i:s" }}</span></td>
+      {% endif %} 
       <td>{{ task.duration }}</td>
       <td>{{ count }}</td>
       {% with metric_list=task.metric_set.all %}
-        {% load tasks_extra %}
         {% if metric_list|get_metric:"Total Collected" == "" %}
           <td><span class="label">Unknown</span></td>
         {% else %}     
-          <td><span class="label label-info">{{ metric_list|get_metric:"Total Collected"|default:"0" }}</span></td>
+          <td><span class="label label-info">{{ metric_list|get_metric:"Total Collected" }}</span></td>
         {% endif %}
         {% if metric_list|get_metric:"Accessed" == "" %}
           <td><span class="label">Unknown</span></td>
