@@ -3,6 +3,12 @@
 History
 -------
 
+0.2.1 (2012-12-19)
++++++++++++++++++++
+
+- Added extended support for task metrics (API/GUI)
+- Metrics are colored to indicate if the metric is within the trend 
+
 0.2 (2012-12-05)
 +++++++++++++++++++
 
