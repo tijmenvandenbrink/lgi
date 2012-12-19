@@ -1,7 +1,5 @@
 {% extends "base.html" %}
-
 {% block title %}Liberty Global - Asset and Configuration Management - Task detail{% endblock %}
-
 {% block sidebar %}
 <ul class="nav nav-list">
   <li class="nav-header">Wandl</li>
@@ -10,7 +8,7 @@
   {% if profiles_list %}
     <ul>
     {% for profile in profiles_list %}
-      <li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.unique_id }}</a></li>
+      <li><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/">{{ profile.unique_id }}</a></li>
     {% endfor %}
     </ul>
   {% else %}
@@ -20,12 +18,13 @@
 {% endblock %}
 
 {% block content %}
+{% load tasks_extra %}
 <div class="row-fluid">
   <div class="span12">
   <ul class="breadcrumb">
   <li><a href="/profiles/">Home</a> <span class="divider">/</span></li>
-  <li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.realm }}</a> <span class="divider">/</span></li>
-  <li class="active">{{ task.uuid }}</li>
+  <li><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/">{{ profile.unique_id }}</a> <span class="divider">/</span></li>
+  <li class="active">{{ task.uuid }}<span class="divider">/</span></li>
   </ul>
   <div class="page-header">
   <h1>{{ profile.realm }} | {{ profile.name }} | {{ task.uuid }}</h1>
@@ -80,36 +79,46 @@
 <div class="span6">
   <div class="well">
     <h2>Statistics</h2>
+    {% if metrics_list %}
     <table class="table table-striped table-bordered">
     <thead>
     <tr>
     <th>Metric</th>
-    <th>#</th>
-    <th>Standard Deviation</th>
-    <th>Mean</th>
+    <th>Value</th>
+    <th>Profile Mean</th>
+    <th>Profile Stdev</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
-    <td>Total Collect</td>
-    <td><span class="badge badge-success">2408</span></td>
-    <td>0.05</td>
-    <td>2408</td>
-    </tr>
-    <tr>
-    <td>ICMP Fail</td>
-    <td><span class="badge badge-important">80</span></td>
-    <td>0.12</td>
-    <td>25</td>
-    </tr>
-    <tr>
-    <td>SNMP Fail</td>
-    <td><span class="badge badge-warning">6</span></td>
-    <td>5.12</td>
-    <td>4</td>
-    </tr>
-    </tbody>
+    {% with pstats=profile|get_profile_stats %}
+    {% for metric in metrics_list %}
+      <tr>
+        {% with m=pstats|get_profile_metric:metric.metric %}
+        <td>{{ metric.metric }}</td>
+        {% if metric.value|add:m.std > m.mean %}
+          <td><span class="label label-warning">{{ metric.value }}</span></td>
+        {% else %}
+          <td><span class="label label-success">{{ metric.value }}</span></td>
+        {% endif %}
+        {% if not m.mean %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ m.mean|floatformat:2 }}</span></td>
+        {% endif %}
+        {% if not m.std %}
+          <td><span class="label">Unknown</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ m.std|floatformat:2 }}</span></td>
+        {% endif %}
+        {% endwith %}
+      </tr>
+    {% endfor %}
+    {% endwith %}
+      </tbody>
     </table>
+    {% else %}
+        <p>No statistics available.</p>
+    {% endif %}
   </div><!--/well-->
 </div><!--/span-->
 </div><!--/row-->

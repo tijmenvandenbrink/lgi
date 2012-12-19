@@ -3,6 +3,12 @@
 History
 -------
 
+0.2 (2012-12-05)
++++++++++++++++++++
+
+- Added support for task metrics (API/GUI)
+
+
 0.1 (2012-11-22)
 +++++++++++++++++++
 
@@ -11,3 +17,6 @@ History
 - Tastypie API
   - Profiles
   - Tasks
+
+
+

@@ -10,7 +10,7 @@
 	{% if profiles_list %}
 	    <ul>
 	    	{% for profile in profiles_list %}
-			<li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.unique_id }}</a></li>
+			<li><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/">{{ profile.unique_id }}</a></li>
 	 	{% endfor %}
 		</ul>
 	{% else %}
@@ -20,12 +20,12 @@
 {% endblock %}
 
 {% block content %}
+{% load tasks_extra %}
   <div class="row-fluid">
     <div class="span12">
       <ul class="breadcrumb">
       <li><a href="/profiles/">Home</a> <span class="divider">/</span></li>
-      <li><a href="/profiles/{{ profile.unique_id }}/">{{ profile.realm }}</a> <span class="divider">/</span></li>
-      <li class="active">{{ profile.name }}</li>
+      <li class="active">{{ profile.unique_id }}</li>
       </ul>
       <div class="page-header">
       <h1>{{ profile.realm }} | {{ profile.name }}</h1>
@@ -39,25 +39,27 @@
       <h2>Summary</h2>
       <dl class="dl-horizontal">
         <dt>Name</dt>
-        <dd>{{ profile.realm }}</dd>
+        <dd>{{ profile.name }}</dd>
         <dt>Country</dt>
-        <dd>EU</dd>
-        <dt>Last Run</dt>
+        <dd>{{ profile.realm }}</dd>
         {% with task=profile.task_set.latest %}
-        <dd>{{ task.start }}</dd>
+        <dt>Polling Server</dt>
+        <dd>{{ task.polling_server }}</dd>
+        <dt>Last Run</dt>
+        <dd>{{ task.start|date:"m/d/Y H:i:s" }}</dd>
         <dt>Last Status</dt>
         {% if task.status == 'Success' %}
           <dd><span class="label label-success">{{ task.status }}</span></dd>
         {% else %}
           <dd><span class="label label-important">{{ task.status }}</span></dd>
         {% endif %}
-        {% endwith %}
-        <dt>Schedule</dt>
-        <dd>Daily</dd>
         <dt>Duration</dt>
-        <dd>2 hours, 29 minutes</dd>
+        <dd>{{ task.duration }}</dd>
+        <dt>Schedule</dt>
+        <dd>Unknown</dd>
         <dt>Number of runs</dt>
-        <dd>312</dd>
+        <dd>{{ profile.task_set.count }}</dd>
+        {% endwith %}
       </dl>
       <table class="table table-striped table-bordered">
       <thead>
@@ -85,26 +87,20 @@
       <thead>
         <tr>
           <th>Metric</th>
-          <th>Standard Deviation</th>
           <th>Mean</th>
+          <th>Standard Deviation</th>
         </tr>
       </thead>
       <tbody>
+        {% with pstats=profile|get_profile_stats %}
+        {% for k, v in pstats.iteritems %}
         <tr>
-          <td>Total Collect</td>
-          <td>0.05</td>
-          <td>2408</td>
+          <td>{{ k }}</td>
+          <td><span class="label label-info">{{ v.mean|floatformat:2 }}</span></td>
+          <td><span class="label label-info">{{ v.std|floatformat:2 }}</span></td>
         </tr>
-        <tr>
-          <td>ICMP Fail</td>
-          <td>0.12</td>
-          <td>25</td>
-        </tr>
-        <tr>
-          <td>SNMP Fail</td>
-          <td>5.12</td>
-          <td>4</td>
-        </tr>
+        {% endfor %}
+        {% endwith %}
       </tbody>
     </table>
     </div><!--/well-->
@@ -113,6 +109,7 @@
 
 {% if profile %}
 	{% if task_list %}
+  {% with pstats=profile|get_profile_stats %}
 	<div class="row-fluid"> 
 	    	<div class="span12">
 			<div class="well">
@@ -120,24 +117,61 @@
 			<table class="table table-striped table-bordered">
 			<thead>
 			<tr>
-			<th>Profile</th>
 			<th>UUID</th>
-			<th>Polling server</th>
 			<th>Start</th>
 			<th>Finished</th>
 			<th>Duration</th>
+      <th>Total Collected</th>
+      <th>Accessed</th>
+      <th>SNMP Fail</th>
+      <th>CLI Fail</th>
 			<th>Status</th>
 			</tr>
 			</thead>
 			<tbody>
 	    {% for task in task_list %}
 			<tr>
-			<td>{{ profile.name }}</td>
-			<td><a href="/profiles/{{ profile.unique_id }}/{{ task.uuid }}/">{{ task.uuid }}</a></td>
-			<td>{{ task.polling_server }}</td>
-			<td>{{ task.start }}</td>
-			<td>{{ task.end }}</td>
-			<td>{{ task.duration }}</td>
+			<td><a href="/profiles/{{ profile.realm }}/{{ profile.name }}/{{ task.uuid }}/">{{ task.uuid }}</a></td>
+			<td>{{ task.start|date:"m/d/Y H:i:s" }}</td>
+			<td>{{ task.end|date:"m/d/Y H:i:s" }}</td>
+      <td>{{ task.duration }}</td>
+      {% with metric_list=task.metric_set.all %}
+        {% with m=pstats|get_profile_metric:"Total Collected" %}
+        {% if not metric_list|get_metric:"Total Collected" %}
+          <td><span class="label">Unknown</span></td>
+        {% elif metric_list|get_metric:"Total Collected"|add:m.std < m.mean %}
+          <td><span class="label label-warning">{{ metric_list|get_metric:"Total Collected"|default:"0" }}</span></td>
+        {% else %}
+          <td><span class="label label-success">{{ metric_list|get_metric:"Total Collected"|default:"0" }}</span></td>
+        {% endif %}
+        {% endwith %}
+        {% with m=pstats|get_profile_metric:"Accessed" %}
+        {% if not metric_list|get_metric:"Accessed" %}
+          <td><span class="label">Unknown</span></td>
+        {% elif metric_list|get_metric:"Accessed"|add:m.std < m.mean %}
+          <td><span class="label label-warning">{{ metric_list|get_metric:"Accessed"|default:"0" }}</span></td>
+        {% else %}     
+          <td><span class="label label-success">{{ metric_list|get_metric:"Accessed"|default:"0" }}</span></td>
+        {% endif %}
+        {% endwith %}
+        {% with m=pstats|get_profile_metric:"SNMP Fail" %}
+        {% if not metric_list|get_metric:"SNMP Fail" %}
+          <td><span class="label">Unknown</span></td>
+        {% elif m.mean|add:m.std < metric_list|get_metric:"SNMP Fail" %}
+          <td><span class="label label-warning">{{ metric_list|get_metric:"SNMP Fail"|default:"0" }}</span></td>
+        {% else %}     
+          <td><span class="label label-success">{{ metric_list|get_metric:"SNMP Fail"|default:"0" }}</span></td>
+        {% endif %}
+        {% endwith %}
+        {% with m=pstats|get_profile_metric:"Failed logins" %}
+        {% if not metric_list|get_metric:"Failed logins" %}
+          <td><span class="label">Unknown</span></td>
+        {% elif m.mean|add:m.std < metric_list|get_metric:"Failed logins" %}
+          <td><span class="label label-warning">{{ metric_list|get_metric:"Failed logins"|default:"0" }}</span></td>
+        {% else %}     
+          <td><span class="label label-info">{{ metric_list|get_metric:"Failed logins"|default:"0" }}</span></td>
+        {% endif %}
+        {% endwith %}
 			{% if task.status == 'Success' %}
 				<td><span class="label label-success">{{ task.status }}</span></td>
 			{% elif task.status == 'Failed' %}
@@ -146,9 +180,11 @@
 				<td><span class="label label-warning">{{ task.status }}</span></td>
 			{% endif %}
 			</tr>
+      {% endwith %}
 	    {% endfor %}
 		</tbody>
 		</table>
+  {% endwith %}
 	{% else %}
 		<p>No tasks available.</p>
 	{% endif %}

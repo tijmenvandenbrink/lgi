@@ -2,7 +2,7 @@ from django.db import models
 
 class Profile(models.Model):
 	''' A profile is a blueprint of a task '''
-	unique_id = models.CharField(max_length=255, primary_key=True)
+	unique_id = models.CharField(max_length=255, unique=True)
 	name = models.CharField(max_length=255)
 	realm = models.CharField(max_length=255)
 	first_seen = models.DateTimeField()
@@ -37,8 +37,8 @@ class Task(models.Model):
 class Metric(models.Model):
 	''' Analytics model for keeping task metrics '''
 	task = models.ForeignKey(Task)
-	metric = models.CharField(max_length=255, primary_key=True)
+	metric = models.CharField(max_length=255)
 	value = models.IntegerField()
 
 	def __unicode__(self):
-		return self.metric
+		return u"%s" % (self.metric)

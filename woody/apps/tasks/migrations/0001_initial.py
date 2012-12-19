@@ -10,7 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Profile'
         db.create_table('tasks_profile', (
-            ('unique_id', self.gf('django.db.models.fields.CharField')(max_length=255, primary_key=True)),
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('unique_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('realm', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('first_seen', self.gf('django.db.models.fields.DateTimeField')()),
@@ -33,8 +34,9 @@ class Migration(SchemaMigration):
 
         # Adding model 'Metric'
         db.create_table('tasks_metric', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('task', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['tasks.Task'])),
-            ('metric', self.gf('django.db.models.fields.CharField')(max_length=255, primary_key=True)),
+            ('metric', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('value', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('tasks', ['Metric'])
@@ -54,7 +56,8 @@ class Migration(SchemaMigration):
     models = {
         'tasks.metric': {
             'Meta': {'object_name': 'Metric'},
-            'metric': ('django.db.models.fields.CharField', [], {'max_length': '255', 'primary_key': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'metric': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'task': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['tasks.Task']"}),
             'value': ('django.db.models.fields.IntegerField', [], {})
         },
@@ -62,13 +65,14 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Profile'},
             'active': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'first_seen': ('django.db.models.fields.DateTimeField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_seen': ('django.db.models.fields.DateTimeField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'realm': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'unique_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'primary_key': 'True'})
+            'unique_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         },
         'tasks.task': {
-            'Meta': {'object_name': 'Task'},
+            'Meta': {'ordering': "['-uuid']", 'object_name': 'Task'},
             'end': ('django.db.models.fields.DateTimeField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'polling_server': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
